@@ -8,6 +8,7 @@ def play_game(level='easy'):
     player = input('Hi, what is your name? ')
     secret = random.randint(1, 30)
     attempts = 0
+    wrong_attempts = []
     score_list = get_score_list()
 
     while True:
@@ -15,7 +16,7 @@ def play_game(level='easy'):
         attempts += 1
 
         if guess == secret:
-            score_list.append({'player': player, "attempts": attempts, "date": str(datetime.datetime.now()), 'secret': secret})
+            score_list.append({'player': player, "attempts": attempts,'wrong': wrong_attempts, "date": str(datetime.datetime.now()), 'secret': secret})
             with open("score_list.txt", "w") as score_file:
                 score_file.write(json.dumps(score_list))
 
@@ -26,6 +27,7 @@ def play_game(level='easy'):
             print("Your guess is not correct... try something smaller")
         elif guess < secret and level == 'easy':
             print("Your guess is not correct... try something bigger")
+        wrong_attempts.append(guess)
 
 # Get a list of all scores
 def get_score_list():
@@ -42,18 +44,22 @@ def get_top_scores():
 
 
 # Run the game
-while True:
-    selection = input("Would you like to A) play a new game, B) see the best scores, or C) quit? ")
+def main():
+    while True:
+        selection = input("Would you like to A) play a new game, B) see the best scores, or C) quit? ")
 
-    if selection.upper() == "A":
-        level = input('Choose your level (easy/hard): ')
-        play_game(level = level)
-    elif selection.upper() == "B":
-        for score_dict in get_top_scores():
-            text = "Player {0} had {1} attempts on {2}. The secret number was {3}.".format(score_dict.get("player"),
-                                                                                           str(score_dict.get("attempts")),
-                                                                                           score_dict.get("date"),
-                                                                                           score_dict.get("secret"))
-            print(text)
-    else:
-        break
+        if selection.upper() == "A":
+            level = input('Choose your level (easy/hard): ')
+            play_game(level = level)
+        elif selection.upper() == "B":
+            for score_dict in get_top_scores():
+                text = "Player {0} had {1} attempts on {2}. The secret number was {3}.The wrong attempts are {4}".format(score_dict.get("player"),
+                                                                                                                         str(score_dict.get("attempts")),
+                                                                                                                         score_dict.get("date"),
+                                                                                                                         score_dict.get("secret"),
+                                                                                                                         score_dict.get("wrong"))
+                print(text)
+        else:
+            break
+if __name__ == "__main__":
+    main()
